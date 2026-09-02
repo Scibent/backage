@@ -122,9 +122,23 @@ grep -Fq "target: test" "$build_workflow" || {
 awk '
     /target: test/ { test_line = NR }
     /push: true/ { push_line = NR }
-    END { exit !(test_line && push_line && test_line < push_line) }
+    /gh workflow run manual.yml/ { deploy_line = NR }
+    END { exit !(test_line && push_line && deploy_line && test_line < push_line && push_line < deploy_line) }
 ' "$build_workflow" || {
-    echo "Build workflow does not test before publishing the image" >&2
+    echo "Build workflow does not test, publish, then deploy in order" >&2
+    exit 1
+}
+grep -Fq 'actions: write' "$build_workflow" || {
+    echo "Build workflow cannot dispatch its successful deployment" >&2
+    exit 1
+}
+grep -Fq "github.ref == 'refs/heads/master'" "$build_workflow" || {
+    echo "Build workflow can deploy a non-master image" >&2
+    exit 1
+}
+grep -Fq "gh workflow run manual.yml --ref \"\$GITHUB_REF_NAME\"" \
+    "$build_workflow" || {
+    echo "Build workflow does not explicitly dispatch its built deployment" >&2
     exit 1
 }
 if grep -Fq "run: bash src/test/regression.sh" "$build_workflow"; then
@@ -159,7 +173,12 @@ for workflow in manual update; do
         echo "$workflow workflow does not reuse the run date for publication" >&2
         exit 1
     }
-    grep -Fq "release_tag=\$(docker run --rm ghcr.io/\$GITHUB_OWNER/\$GITHUB_REPO:master bkg release-tag -D \"\$RUN_DATE\")" \
+    if [[ $(grep -Fc "repository_image=\"ghcr.io/\${GITHUB_REPOSITORY,,}:master\"" \
+        "$workflow_file") -ne 2 ]]; then
+        echo "$workflow workflow does not normalize each repository image reference" >&2
+        exit 1
+    fi
+    grep -Fq "release_tag=\$(docker run --rm \"\$repository_image\" bkg release-tag -D \"\$RUN_DATE\")" \
         "$workflow_file" || {
         echo "$workflow workflow does not run release-tag from its image" >&2
         exit 1
@@ -184,7 +203,7 @@ for workflow in manual update; do
         echo "$workflow workflow still forwards a broad environment prefix" >&2
         exit 1
     fi
-    grep -Fq "ghcr.io/\$GITHUB_OWNER/\$GITHUB_REPO:master" "$workflow_file" || {
+    grep -Fq "\"\$repository_image\"" "$workflow_file" || {
         echo "$workflow workflow does not run its repository-owned image" >&2
         exit 1
     }
@@ -194,16 +213,12 @@ for workflow in manual update; do
     }
 done
 
-if grep -Fq 'pull_request:' "$manual_workflow"; then
-    echo "Manual workflow still runs after unrelated pull requests close" >&2
+if grep -Fq 'workflow_run:' "$manual_workflow"; then
+    echo "Manual workflow still relies on an implicit Build completion event" >&2
     exit 1
 fi
-grep -Fq 'branches:' "$manual_workflow" || {
-    echo "Manual workflow does not limit completed builds to a source branch" >&2
-    exit 1
-}
-grep -Fq '      - master' "$manual_workflow" || {
-    echo "Manual workflow can run for a build that did not publish the master image" >&2
+grep -Fq 'workflow_dispatch:' "$manual_workflow" || {
+    echo "Manual workflow cannot be dispatched after a successful Build" >&2
     exit 1
 }
 
@@ -235,12 +250,16 @@ grep -Fq "\${{ github.repository }}-database-publication" "$sync_workflow" || {
     echo "Upstream sync does not serialize with database publication" >&2
     exit 1
 }
-grep -Fq 'actions: write' "$sync_workflow" || {
-    echo "Upstream sync cannot dispatch the synchronized build" >&2
+grep -Fq 'contents: read' "$sync_workflow" || {
+    echo "Upstream sync grants its API token unnecessary Contents write access" >&2
     exit 1
 }
-grep -Fq 'contents: write' "$sync_workflow" || {
-    echo "Upstream sync cannot publish its merge" >&2
+if grep -Fq 'contents: write' "$sync_workflow"; then
+    echo "Upstream sync still tries to push workflow files with GITHUB_TOKEN" >&2
+    exit 1
+fi
+grep -Fq "ssh-key: \${{ secrets.BKG_SYNC_SSH_KEY }}" "$sync_workflow" || {
+    echo "Upstream sync does not use its repository-only push credential" >&2
     exit 1
 }
 grep -Fq 'fetch-depth: 1' "$sync_workflow" || {
@@ -267,22 +286,14 @@ grep -Fq "git push origin \"HEAD:refs/heads/\$FORK_BRANCH\"" "$sync_workflow" ||
     echo "Upstream sync does not publish a normal branch update" >&2
     exit 1
 }
-grep -Fq "gh workflow run publish.yml --ref \"\$FORK_BRANCH\"" "$sync_workflow" || {
-    echo "Upstream sync does not explicitly dispatch the suppressed build" >&2
-    exit 1
-}
 if grep -Eq 'git push .* (-f|--force)' "$sync_workflow"; then
     echo "Upstream sync must not force-push a fork branch" >&2
     exit 1
 fi
-awk '
-    /git push origin/ { push_line = NR }
-    /gh workflow run publish.yml/ { build_line = NR }
-    END { exit !(push_line && build_line && push_line < build_line) }
-' "$sync_workflow" || {
-    echo "Upstream sync does not publish source before dispatching its build" >&2
+if grep -Fq 'gh workflow run publish.yml' "$sync_workflow"; then
+    echo "Upstream sync redundantly dispatches the Build triggered by its SSH push" >&2
     exit 1
-}
+fi
 
 setup_fork="$repo_dir/src/setup-fork.sh"
 [[ -x $setup_fork ]] || {
@@ -294,12 +305,40 @@ grep -Fq -- '--default-branch-only' "$setup_fork" || {
     echo "Programmatic fork setup can inherit generated branches" >&2
     exit 1
 }
-grep -Fq 'state == "disabled_fork"' "$setup_fork" || {
+grep -Fq "\$workflow_state == disabled_fork" "$setup_fork" || {
     echo "Programmatic fork setup does not enable fork-disabled workflows" >&2
     exit 1
 }
 grep -Fq 'workflow run publish.yml' "$setup_fork" || {
     echo "Programmatic fork setup does not start the initial Build" >&2
+    exit 1
+}
+grep -Fq -- '--rotate-sync-key' "$setup_fork" || {
+    echo "Programmatic fork setup cannot repair its synchronization credential" >&2
+    exit 1
+}
+grep -Fq -- '--no-sync-key' "$setup_fork" || {
+    echo "Programmatic fork setup cannot opt out of managed synchronization" >&2
+    exit 1
+}
+grep -Fq 'BKG_SYNC_SSH_KEY' "$setup_fork" || {
+    echo "Programmatic fork setup does not store its synchronization credential" >&2
+    exit 1
+}
+grep -Fq -- '-F read_only=false' "$setup_fork" || {
+    echo "Programmatic fork setup does not grant its repository deploy key write access" >&2
+    exit 1
+}
+grep -Fq "gh workflow disable \"\$workflow_id\"" "$setup_fork" || {
+    echo "Programmatic fork setup leaves synchronization active without a key" >&2
+    exit 1
+}
+grep -Fq "Upstream synchronization enabled" "$setup_fork" || {
+    echo "Programmatic fork setup cannot opt back into synchronization" >&2
+    exit 1
+}
+grep -Fq "::error title=Managed synchronization is not configured" "$sync_workflow" || {
+    echo "Upstream sync does not explain how to repair a missing credential" >&2
     exit 1
 }
 
@@ -337,6 +376,18 @@ grep -Fq 'bkg vacuum-releases' "$repo_dir/.github/workflows/vacuum.yml" || {
     echo "vacuum does not use selective database release retention" >&2
     exit 1
 }
+
+grep -Fq "repository_image=\"ghcr.io/\${GITHUB_REPOSITORY,,}:master\"" \
+    "$repo_dir/.github/workflows/vacuum.yml" || {
+    echo "vacuum does not normalize its repository image reference" >&2
+    exit 1
+}
+
+if grep -R -Fq "ghcr.io/\$GITHUB_OWNER/\$GITHUB_REPO" \
+    "$repo_dir/.github/workflows"; then
+    echo "A workflow constructs a case-sensitive repository image reference" >&2
+    exit 1
+fi
 
 if grep -Fq 'delete-old-releases' "$repo_dir/.github/workflows/vacuum.yml"; then
     echo "vacuum still uses generic semver release cleanup" >&2
