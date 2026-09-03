@@ -1,0 +1,23 @@
+{
+  "dashboard_schema_version": 1,
+  "entrypoint": "index.html",
+  "files": [
+    {
+      "bytes": 33430,
+      "path": ".bkg-site/assets/SiteShell.astro_astro_type_script_index_0_lang.BOnCMhfz.js",
+      "sha256": "a487443df2693241737f74911c72d0fcb849e46a135f85920e38bd4bfd7f3c01"
+    },
+    {
+      "bytes": 138556,
+      "path": ".bkg-site/assets/history-chart.DFfGVAYU.js",
+      "sha256": "2fcd0840fff76949813e452258ca9e67586c87e5dc4c1226d235e772faea7c9b"
+    },
+    {
+      "bytes": 79892,
+      "path": "index.html",
+      "sha256": "0454f93e3d228729ece15417418a053a7b60776ef18f288eaaace8f8499ae3a9"
+    }
+  ],
+  "schema_version": 1,
+  "site_shell_version": 3
+}

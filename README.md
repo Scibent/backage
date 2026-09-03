@@ -1,0 +1,289 @@
+<!-- Generated READMEs come from this file. Edit this template, not README.md. -->
+
+<div align="center">
+
+[![logo](logo-b.webp)](https://github.com/Scibent/backage)
+
+# [backage](https://github.com/Scibent/backage)
+
+**It's all part and parcel**
+
+---
+
+[![packages](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2F.json&query=%24.packages&logo=github&logoColor=959da5&label=packages&labelColor=333a41&color=grey)](https://github.com/Scibent/backage/tree/index) [![updated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2F.json&query=%24.date&logo=github&logoColor=959da5&label=updated&labelColor=333a41&color=indigo)](https://github.com/Scibent/backage/releases/latest)
+
+[![tag](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2FScibent%2Fbackage%2Fbackage.xml&query=%2Fxml%2Fversion%5B.%2Flatest%5B.%3D%22true%22%5D%5D%2Ftags%5B.!%3D%22latest%22%5D&logo=github&logoColor=959da5&label=tag&labelColor=333a41&color=black)](https://github.com/Scibent/backage/pkgs/container/backage) [![build](https://github.com/Scibent/backage/actions/workflows/publish.yml/badge.svg)](https://github.com/Scibent/backage/pkgs/container/backage) [![size](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2FScibent%2Fbackage%2Fbackage.json&query=%24.size&logo=github&logoColor=959da5&label=size&labelColor=333a41&color=sienna)](https://github.com/Scibent/backage/pkgs/container/backage) [![runs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2FScibent%2Fbackage%2Fbackage.json&query=%24.downloads&logo=github&logoColor=959da5&label=runs&labelColor=333a41)](https://github.com/Scibent/backage/pkgs/container/backage)
+
+</div>
+
+Ever wish you could show npm, gem, mvn, Gradle, NuGet, or GHCR badges for GitHub Packages? Or just query for the download counts? This endpoint makes that possible, using only free GitHub resources; the API doesn't, and has never, exposed the public metadata that other registries provide.
+
+## Getting Started
+
+If this is [`ipitio/backage`](https://github.com/ipitio/backage), all you have to do is **star the repo to get your public packages added!** The service's circular priority queue will update the [closed-loop system](https://github.com/Scibent/backage/releases/latest) with them within the next few hours. Additionally watching and forking the repo, and following the owner, are ways to increase their priority. Yes, I know, but these are the graphs GitHub has available.
+
+> [!WARNING]
+> Ensure your profile is [public](https://github.com/ipitio/backage/issues/34#issuecomment-2968850773) so that this repo can see your packages.
+
+Otherwise, if this is a fork, you'd prefer an alternative method, or your packages weren't added to the [index](https://github.com/Scibent/backage/tree/index) after a day, enter the case-sensitive name of each missing user or organization on a new line at the top of the queue, `owners.txt`, [here](https://github.com/Scibent/backage/edit/master/owners.txt) and make a pull request. Don't worry -- while my Contribution Graph is an uptime monitor of sorts, yours won't be. Run `bkg workflow-update --help` in the image for the available update options; the common ones are shown in `Self-Host` below.
+
+> [!TIP]
+> You only need to add names to the queue; IDs are fetched as needed and entries are removed once processed.
+
+New packages may not be added until *all* existing ones are refreshed; you should also create an independent instance that'll update faster and more frequently. Fork only the `master` branch, choose one of the following options, and use the [Alternative URL](#alternative-url) when it changes. This centralized repo will then serve as a backup for all subsets of packages not in `optout.txt`.
+
+> [!IMPORTANT]
+> Your own packages will be picked up automatically! If you need to edit `owners.txt`, do so after the first run.
+
+The fork-only **sync upstream** workflow checks for Main source changes every
+six hours without downloading Main's generated branches. A managed sync retains
+the fork's tracked `owners.txt`, `optout.txt`, and generated `README.md`, adopts
+all other Main source, then builds and runs the synchronized deployment. It
+never force-pushes. Its repository-only deploy key lets it update workflow
+files without storing a maintainer-wide token. Existing forks need one manual
+upstream merge to acquire this workflow and must run the current setup script
+once; new forks created without the setup script must configure the key and
+enable scheduled workflows.
+
+Forks that intentionally maintain source changes should disable **sync
+upstream** and run `bkg configure-fork-merge .` once in each local clone.
+Ordinary merges will then preserve the same three deployment-owned files while
+leaving other source differences to Git. Use a merge rather than a rebase, and
+do not use GitHub's **Sync fork** button for an update that changes those files.
+
+<details>
+<summary>With Actions</summary>
+
+You can use GitHub-hosted runners or your own.
+
+#### GitHub Website
+
+1. Select **Copy the `master` branch only** when creating the fork
+2. Enable Actions and every workflow disabled because the repository is a fork
+3. For managed source updates, create a repository-specific Ed25519 key, add
+   its public key under **Deploy keys** with write access, and save its private
+   key as the Actions secret `BKG_SYNC_SSH_KEY`; otherwise leave **sync
+   upstream** disabled
+4. Run **Build** once, then **sync upstream** whenever an existing fork is behind
+
+#### GitHub CLI
+
+The checked-in [`setup-fork.sh`](https://github.com/ipitio/backage/blob/master/src/setup-fork.sh)
+creates a personal fork, enables the workflows GitHub disables on new forks,
+configures a repository-only synchronization key, and dispatches its initial
+Build. It is safe to run again: the key, existing deployment branches, and
+other intentionally disabled workflows are left alone. Normal setup enables
+**sync upstream**; run it with `--rotate-sync-key` only when that credential
+needs replacement. Pass `--no-sync-key` to skip key creation and keep
+**sync upstream** disabled while enabling the other fork workflows.
+
+```bash
+gh api -H 'Accept: application/vnd.github.raw+json' \
+  repos/ipitio/backage/contents/src/setup-fork.sh | bash
+```
+
+For an organization fork, pass its owner to the script:
+
+```bash
+gh api -H 'Accept: application/vnd.github.raw+json' \
+  repos/ipitio/backage/contents/src/setup-fork.sh | bash -s -- -o ORGANIZATION
+```
+
+</details>
+
+<details>
+<summary>Self-Host</summary>
+
+This is an example for `systemd`; adapt it to your needs. Please note:
+
+- Docker needs to be installed
+- `GITHUB_TOKEN` can be `$(gh auth token)`
+- `-m 0` ensures only the public packages of the owners you've added are updated (default)
+  - You'll need the proper permissions to update private packages
+- `-d 0` allows everything to be updated in one go
+  - A graceful restart is initiated every 4 hours by default
+
+```bash
+echo "[Unit]
+Description=Run backage
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+ExecStart=/usr/bin/sh -c '                   \\
+  GITHUB_TOKEN=<PAT>                        ;\\
+  GITHUB_OWNER=<username>                   ;\\
+  GITHUB_REPO=backage                       ;\\
+  GITHUB_BRANCH=master                      ;\\
+  BKG_PATH=\$GITHUB_REPO/\$GITHUB_BRANCH    ;\\
+  mkdir -p /opt/\$BKG_PATH                  ;\\
+  docker run -v /opt/\$BKG_PATH:/app         \\
+    --env-file <(env | grep GITHUB)          \\
+    ghcr.io/\$GITHUB_OWNER/\${BKG_PATH////:} \\
+    bkg workflow-update -C /app -m 0 -d 0'
+
+[Install]
+WantedBy=multi-user.target
+" | sudo tee /etc/systemd/system/bkg.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now bkg
+```
+
+</details>
+
+## The Endpoint
+
+```prolog
+https://ipitio.github.io/backage/OWNER/[REPO/[PACKAGE]].FORMAT
+```
+
+Once the packages you're interested in have been added, replace the parameters with their respective values, scoping to your parsing needs, then access the latest data however you want. The format can be either `json` or `xml`; request the corresponding `.xml` path directly rather than converting the JSON endpoint in the Pages dashboard.
+
+> [!NOTE]
+> Package endpoints keep detailed version data. Owner and repo aggregate endpoints bound their version detail so large self-hosted indexes can still finish JSON/XML publication. `BKG_OWNER_ARRAY_MAX_BYTES` defaults to `35000000`; `BKG_OWNER_ARRAY_VERSION_LIMIT` can force a fixed per-package aggregate version limit, and negative values keep full version arrays. DB-backed aggregates estimate a safe per-package version limit from the database before rendering once; `BKG_OWNER_ARRAY_DB_VERSION_LIMIT` can force a fixed DB-backed aggregate limit, and `BKG_OWNER_ARRAY_DB_FALLBACK_VERSION_LIMIT` defaults to `2` if estimation is unavailable. JSON/XML trimming uses `BKG_JSON_XML_MAX_BYTES` (`50000000`) and `BKG_JSON_XML_HARD_MAX_BYTES` (`100000000`).
+
+> [!NOTE]
+> Use something like [shields.io/json](https://shields.io/badges/dynamic-json-badge) or [shields.io/xml](https://shields.io/badges/dynamic-xml-badge) to make badges like [this one](https://github.com/badges/shields/issues/5594#issuecomment-2157626147). You'll need the latter to evaluate expressions, like filters ([issue](https://github.com/ipitio/backage/issues/23)).
+
+### Available Properties
+
+<details>
+
+<summary>Package</summary>
+
+|       Property        |     Type     | Description                                             |
+| :-------------------: | :----------: | ------------------------------------------------------- |
+|      `owner_id`       |    number    | The ID of the owner                                     |
+|     `owner_type`      |    string    | The type of owner (e.g. `users`)                        |
+|    `package_type`     |    string    | The type of package (e.g. `container`)                  |
+|        `owner`        |    string    | The owner of the package                                |
+|        `repo`         |    string    | The repository of the package                           |
+|       `package`       |    string    | The package name                                        |
+|        `date`         |    string    | The most recent date the package was refreshed          |
+|        `size`         |    string    | Formatted best size from the newest sized version       |
+|      `versions`       |    string    | Formatted count of all versions recently tracked        |
+|       `tagged`        |    string    | Formatted count of all tagged versions recently tracked |
+|     `owner_rank`      |    string    | Formatted rank by downloads within the owner            |
+|      `repo_rank`      |    string    | Formatted rank by downloads within the repository       |
+|      `downloads`      |    string    | Formatted count of all downloads                        |
+|   `downloads_month`   |    string    | Formatted count of all downloads in the last month      |
+|   `downloads_week`    |    string    | Formatted count of all downloads in the last week       |
+|    `downloads_day`    |    string    | Formatted count of all downloads in the last day        |
+|      `raw_size`       |    number    | Best size from the newest sized version, in bytes       |
+|    `raw_versions`     |    number    | Count of versions ever tracked                          |
+|     `raw_tagged`      |    number    | Count of tagged versions ever tracked                   |
+|   `raw_owner_rank`    |    number    | Rank by downloads within the owner                      |
+|    `raw_repo_rank`    |    number    | Rank by downloads within the repository                 |
+|    `raw_downloads`    |    number    | Count of all downloads                                  |
+| `raw_downloads_month` |    number    | Count of all downloads in the last month                |
+| `raw_downloads_week`  |    number    | Count of all downloads in the last week                 |
+|  `raw_downloads_day`  |    number    | Count of all downloads in the last day                  |
+|       `version`       | object array | The versions of the package (see below)                 |
+
+</details>
+
+<details>
+
+<summary>Version</summary>
+
+|       Property        |     Type     | Description                                    |
+| :-------------------: | :----------: | ---------------------------------------------- |
+|         `id`          |    number    | The ID of the version                          |
+|        `name`         |    string    | The version name                               |
+|        `date`         |    string    | The most recent date the version was refreshed |
+|       `newest`        |   boolean    | Whether the version is the newest              |
+|       `latest`        |   boolean    | Whether the version is the newest tagged       |
+|        `size`         |    string    | Formatted best available size of the version   |
+|      `downloads`      |    string    | Formatted count of downloads                   |
+|   `downloads_month`   |    string    | Formatted count of downloads in the last month |
+|   `downloads_week`    |    string    | Formatted count of downloads in the last week  |
+|    `downloads_day`    |    string    | Formatted number of downloads in the last day  |
+|      `raw_size`       |    number    | Best available size of the version, in bytes   |
+|    `raw_downloads`    |    number    | Count of downloads                             |
+| `raw_downloads_month` |    number    | Count of downloads in the last month           |
+| `raw_downloads_week`  |    number    | Count of downloads in the last week            |
+|  `raw_downloads_day`  |    number    | Count of downloads in the last day             |
+|        `tags`         | string array | The tags of the version                        |
+
+</details>
+
+### Query Syntax
+
+<details>
+
+<summary>JSON</summary>
+
+You can query a package for its properties, like size or version:
+
+```jboss-cli
+$.PROPERTY
+```
+
+```jboss-cli
+$.size
+```
+
+Versions may be filtered in and tags out:
+
+```jboss-cli
+$.version[FILTER].PROPERTY
+```
+
+```jboss-cli
+$.version[?(@.latest)].tags[?(@!="latest")]
+```
+
+As can packages in `owner[/repo]/.json` files:
+
+```jboss-cli
+$.[FILTER].PROPERTY
+```
+
+</details>
+
+<details>
+
+<summary>XML</summary>
+
+You can query a package for its properties, like size or version:
+
+```prolog
+//PROPERTY
+```
+
+```prolog
+//size
+```
+
+Versions can be filtered in and tags out:
+
+```prolog
+//version[FILTER]/PROPERTY
+```
+
+```prolog
+//version[./latest[.="true"]]/tags[.!="latest"]
+```
+
+As can packages in `owner[/repo]/.xml` files:
+
+```prolog
+//package[FILTER]/PROPERTY
+```
+
+</details>
+
+### Alternative URL
+
+```prolog
+https://github.com/Scibent/backage/raw/index/OWNER/[REPO/[PACKAGE]].FORMAT
+```
+
+The endpoint is also available here! This will change to your fork once it updates.
+
+## Documentation
+
+- [Contributing](https://github.com/Scibent/backage/blob/master/CONTRIBUTING.md)
