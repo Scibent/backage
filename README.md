@@ -2,17 +2,17 @@
 
 <div align="center">
 
-[![logo](src/img/logo-b.webp)](https://github.com/ipitio/backage)
+[![logo](src/img/logo-b.webp)](https://github.com/Scibent/backage)
 
-# [backage](https://github.com/ipitio/backage)
+# [backage](https://github.com/Scibent/backage)
 
 **It's all part and parcel**
 
 ---
 
-[![packages](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2Fipitio%2Fbackage%2Fraw%2Findex%2F.json&query=%24.packages&logo=github&logoColor=959da5&label=packages&labelColor=333a41&color=grey)](https://github.com/ipitio/backage/tree/index) [![updated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2Fipitio%2Fbackage%2Fraw%2Findex%2F.json&query=%24.date&logo=github&logoColor=959da5&label=updated&labelColor=333a41&color=indigo)](https://github.com/ipitio/backage/releases/latest)
+[![packages](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2F.json&query=%24.packages&logo=github&logoColor=959da5&label=packages&labelColor=333a41&color=grey)](https://github.com/Scibent/backage/tree/index) [![updated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2F.json&query=%24.date&logo=github&logoColor=959da5&label=updated&labelColor=333a41&color=indigo)](https://github.com/Scibent/backage/releases/latest)
 
-[![tag](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fgithub.com%2Fipitio%2Fbackage%2Fraw%2Findex%2Fipitio%2Fbackage%2Fbackage.xml&query=%2Fxml%2Fversion%5B.%2Flatest%5B.%3D%22true%22%5D%5D%2Ftags%5B.!%3D%22latest%22%5D&logo=github&logoColor=959da5&label=tag&labelColor=333a41&color=black)](https://github.com/ipitio/backage/pkgs/container/backage) [![build](https://github.com/ipitio/backage/actions/workflows/publish.yml/badge.svg)](https://github.com/ipitio/backage/pkgs/container/backage) [![size](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2Fipitio%2Fbackage%2Fraw%2Findex%2Fipitio%2Fbackage%2Fbackage.json&query=%24.size&logo=github&logoColor=959da5&label=size&labelColor=333a41&color=sienna)](https://github.com/ipitio/backage/pkgs/container/backage) [![runs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2Fipitio%2Fbackage%2Fraw%2Findex%2Fipitio%2Fbackage%2Fbackage.json&query=%24.downloads&logo=github&logoColor=959da5&label=runs&labelColor=333a41)](https://github.com/ipitio/backage/pkgs/container/backage)
+[![tag](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2FScibent%2Fbackage%2Fbackage.xml&query=%2Fxml%2Fversion%5B.%2Flatest%5B.%3D%22true%22%5D%5D%2Ftags%5B.!%3D%22latest%22%5D&logo=github&logoColor=959da5&label=tag&labelColor=333a41&color=black)](https://github.com/Scibent/backage/pkgs/container/backage) [![build](https://github.com/Scibent/backage/actions/workflows/publish.yml/badge.svg)](https://github.com/Scibent/backage/pkgs/container/backage) [![size](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2FScibent%2Fbackage%2Fbackage.json&query=%24.size&logo=github&logoColor=959da5&label=size&labelColor=333a41&color=sienna)](https://github.com/Scibent/backage/pkgs/container/backage) [![runs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FScibent%2Fbackage%2Fraw%2Findex%2FScibent%2Fbackage%2Fbackage.json&query=%24.downloads&logo=github&logoColor=959da5&label=runs&labelColor=333a41)](https://github.com/Scibent/backage/pkgs/container/backage)
 
 </div>
 
@@ -20,12 +20,12 @@ Ever wish you could show npm, gem, mvn, Gradle, NuGet, or GHCR badges for GitHub
 
 ## Getting Started
 
-If this is [`ipitio/backage`](https://github.com/ipitio/backage), all you have to do is **star the repo to get your public packages added!** The service's circular priority queue will update the [closed-loop system](https://github.com/ipitio/backage/releases/latest) with them within the next few hours. Additionally watching and forking the repo, and following the owner, are ways to increase their priority. Yes, I know, but these are the graphs GitHub has available.
+If this is [`ipitio/backage`](https://github.com/ipitio/backage), all you have to do is **star the repo to get your public packages added!** The service's circular priority queue will update the [closed-loop system](https://github.com/Scibent/backage/releases/latest) with them within the next few hours. Additionally watching and forking the repo, and following the owner, are ways to increase their priority. Yes, I know, but these are the graphs GitHub has available.
 
 > [!WARNING]
 > Ensure your profile is [public](https://github.com/ipitio/backage/issues/34#issuecomment-2968850773) so that this repo can see your packages.
 
-Otherwise, if this is a fork, you'd prefer an alternative method, or your packages weren't added to the [index](https://github.com/ipitio/backage/tree/index) after a day, enter the case-sensitive name of each missing user or organization on a new line at the top of the queue, `owners.txt`, [here](https://github.com/ipitio/backage/edit/master/owners.txt) and make a pull request. Don't worry -- while my Contribution Graph is an uptime monitor of sorts, yours won't be. Run `bkg workflow-update --help` in the image for the available update options; the common ones are shown in `Self-Host` below.
+Otherwise, if this is a fork, you'd prefer an alternative method, or your packages weren't added to the [index](https://github.com/Scibent/backage/tree/index) after a day, enter the case-sensitive name of each missing user or organization on a new line at the top of the queue, `owners.txt`, [here](https://github.com/Scibent/backage/edit/master/owners.txt) and make a pull request. Don't worry -- while my Contribution Graph is an uptime monitor of sorts, yours won't be. Run `bkg workflow-update --help` in the image for the available update options; the common ones are shown in `Self-Host` below.
 
 > [!TIP]
 > You only need to add names to the queue; IDs are fetched as needed and entries are removed once processed.
@@ -39,9 +39,11 @@ The fork-only **sync upstream** workflow checks for Main source changes every
 six hours without downloading Main's generated branches. A managed sync retains
 the fork's tracked `owners.txt`, `optout.txt`, and generated `README.md`, adopts
 all other Main source, then builds and runs the synchronized deployment. It
-never force-pushes. Existing forks need one manual upstream merge to acquire
-this workflow, and new forks created without the setup script must enable
-scheduled workflows.
+never force-pushes. Its repository-only deploy key lets it update workflow
+files without storing a maintainer-wide token. Existing forks need one manual
+upstream merge to acquire this workflow and must run the current setup script
+once; new forks created without the setup script must configure the key and
+enable scheduled workflows.
 
 Forks that intentionally maintain source changes should disable **sync
 upstream** and run `bkg configure-fork-merge .` once in each local clone.
@@ -58,14 +60,22 @@ You can use GitHub-hosted runners or your own.
 
 1. Select **Copy the `master` branch only** when creating the fork
 2. Enable Actions and every workflow disabled because the repository is a fork
-3. Run **Build** once, then **sync upstream** whenever an existing fork is behind
+3. For managed source updates, create a repository-specific Ed25519 key, add
+   its public key under **Deploy keys** with write access, and save its private
+   key as the Actions secret `BKG_SYNC_SSH_KEY`; otherwise leave **sync
+   upstream** disabled
+4. Run **Build** once, then **sync upstream** whenever an existing fork is behind
 
 #### GitHub CLI
 
 The checked-in [`setup-fork.sh`](https://github.com/ipitio/backage/blob/master/src/setup-fork.sh)
 creates a personal fork, enables the workflows GitHub disables on new forks,
-and dispatches its initial Build. It is safe to run again: existing deployment
-branches and intentionally disabled workflows are left alone.
+configures a repository-only synchronization key, and dispatches its initial
+Build. It is safe to run again: the key, existing deployment branches, and
+other intentionally disabled workflows are left alone. Normal setup enables
+**sync upstream**; run it with `--rotate-sync-key` only when that credential
+needs replacement. Pass `--no-sync-key` to skip key creation and keep
+**sync upstream** disabled while enabling the other fork workflows.
 
 ```bash
 gh api -H 'Accept: application/vnd.github.raw+json' \
@@ -269,11 +279,11 @@ As can packages in `owner[/repo]/.xml` files:
 ### Alternative URL
 
 ```py
-https://github.com/ipitio/backage/raw/index/OWNER/[REPO/[PACKAGE]].FORMAT
+https://github.com/Scibent/backage/raw/index/OWNER/[REPO/[PACKAGE]].FORMAT
 ```
 
 The endpoint is also available here! This will change to your fork once it updates.
 
 ## Documentation
 
-- [Contributing](https://github.com/ipitio/backage/blob/master/CONTRIBUTING.md)
+- [Contributing](https://github.com/Scibent/backage/blob/master/CONTRIBUTING.md)
