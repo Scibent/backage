@@ -73,6 +73,35 @@ def _write(path: Path, value: JsonValue) -> None:
     path.write_text(json.dumps(value), encoding="utf-8")
 
 
+def test_xml_repair_rolls_back_json_when_xml_replacement_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """XML-based metric repair cannot partially replace its input JSON file."""
+
+    source = tmp_path / "demo.json"
+    _write(source, _package())
+    publish_json_file(source, lambda: None)
+    _write(source, _unobserved())
+    original_json = source.read_bytes()
+    xml_path = source.with_suffix(".xml")
+    original_xml = xml_path.read_bytes()
+    replace = Path.replace
+
+    def fail_xml(path: Path, target: str | Path) -> Path:
+        if path.parent == tmp_path and Path(target) == xml_path:
+            raise OSError("XML replacement failed")
+        return replace(path, target)
+
+    monkeypatch.setattr(Path, "replace", fail_xml)
+
+    with pytest.raises(OSError, match="XML replacement failed"):
+        write_xml_file(source, lambda: None)
+
+    assert source.read_bytes() == original_json
+    assert xml_path.read_bytes() == original_xml
+    assert sorted(path.name for path in tmp_path.iterdir()) == ["demo.json", "demo.xml"]
+
+
 @pytest.mark.parametrize("missing", [-1, None, False, "-1"])
 def test_unknown_metric_preserves_value_display_and_observation(
     missing: JsonValue,
@@ -173,10 +202,14 @@ def test_pair_publication_preserves_metrics_in_every_entrypoint(
     """A missing JSON endpoint or direct XML conversion cannot erase known XML."""
 
     destination = tmp_path / "demo.json"
-    _write(destination, _package())
+    previous = _package()
+    previous.update(raw_versions=1, versions="1", raw_tagged=0, tagged="0")
+    _write(destination, previous)
     publish_json_file(destination, lambda: None)
     source = tmp_path / "source.json"
-    _write(source, _unobserved())
+    current = _unobserved()
+    current.update(raw_versions=-1, versions="-1", raw_tagged=-1, tagged="-1")
+    _write(source, current)
     if baseline == "xml":
         destination.unlink()
     if baseline == "json-unknown":
@@ -191,10 +224,18 @@ def test_pair_publication_preserves_metrics_in_every_entrypoint(
     else:
         publish_json_file(source, lambda: None, destination=destination)
 
-    published: object = json.loads(destination.read_bytes())
+    published = cast(JsonValue, json.loads(destination.read_bytes()))
     assert isinstance(published, dict)
     assert published["raw_downloads"] == 1500
     assert published["raw_size"] == 123
+    assert published["raw_versions"] == 1
+    assert published["raw_tagged"] == 0
+    assert published["versions"] == "1"
+    assert published["tagged"] == "0"
+    observations = published["metric_observations"]
+    assert isinstance(observations, dict)
+    assert "versions" not in observations
+    assert "tagged" not in observations
     xml = destination.with_suffix(".xml").read_text(encoding="utf-8")
     assert "<raw_downloads>1500</raw_downloads>" in xml
     assert f"<observed_on>{_OLD_DATE}</observed_on><stale>true</stale>" in xml
